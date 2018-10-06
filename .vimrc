@@ -1,3 +1,4 @@
+let mapleader = "\<Space>"
 "开启语法高亮
 syntax on
 
@@ -16,11 +17,21 @@ set cindent
 "智能选择对齐方式      
 set smartindent 
 
+"括号匹配
+inoremap <> <><Esc>i
+inoremap [] []<Esc>i
+inoremap '' ''<Esc>i
+inoremap "" ""<Esc>i
+inoremap () ()<Esc>i
+inoremap {} {}<Esc>i
+map <C-n> :nohlsearch<CR>
+
 set cursorcolumn " 高亮光标列 
 set cursorline " 高亮光标行
 
 "tab为4个空格      
 set tabstop=4  
+set expandtab
 
 
 "当前行之间交错时使用4个空格      
@@ -29,6 +40,31 @@ set shiftwidth=4
 " 使用Backspace
 set nocompatible
 set backspace=indent,eol,start
+
+"注释相关
+"autocmd FileType c,cpp,verilpg,asm             let b:comment_leader = '\/\/ '
+"autocmd FileType perl,python,sh,tcl            let b:comment_leader = '# '
+"noremap <silent> <leader>cc :<C-E>s/^/<C-r>=b:comment_leader<CR>/<CR>:nohlsearch<CR>
+"noremap <silent> <leader>cu :<C-E>s/^\V<C-r>=b:comment_leader<CR>//e<CR>:nohlsearch<CR>
+
+autocmd FileType c,cpp,java,scala let b:comment_leader = '//'
+autocmd FileType sh,ruby,python,perl   let b:comment_leader = '#'
+autocmd FileType conf,fstab       let b:comment_leader = '#'
+autocmd FileType tex              let b:comment_leader = '%'
+autocmd FileType mail             let b:comment_leader = '>'
+autocmd FileType vim              let b:comment_leader = '"'
+autocmd FileType nasm             let b:comment_leader = ';'
+ 
+function! CommentLine()
+    execute ':silent! s/^\(.*\)/' . b:comment_leader . ' \1/g'
+endfunction
+ 
+function! UncommentLine()
+    execute ':silent! s/^' . b:comment_leader . ' //g'
+endfunction
+ 
+map <silent> <leader>cc :call CommentLine()<CR>
+map <silent> <leader>cu :call UncommentLine()<CR>
 
 
 " 高亮搜索结果
@@ -44,10 +80,16 @@ set showcmd
 
 "显示行号：
 set number
+set relativenumber
+augroup relativenumber
+    auto!
+    autocmd InsertLeave * : set relativenumber
+    autocmd InsertEnter * : set norelativenumber
+augroup END
 
 "为深色背景调整配色
 syntax enable
-set background=dark
+set background=light
 colorscheme solarized
 let g:solarized_termcolors=256
 let g:solarized_termtrans=1
@@ -59,7 +101,6 @@ au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|
 
 set tags=./.tags;,.tags
 
-let mapleader = "\<Space>"
 
 set nobackup       " no backup files
 set noswapfile     " no swap files
